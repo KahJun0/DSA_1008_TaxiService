@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+<table>&nbsp</table>
+<div class="d-flex justify-content-between">
+    <div></div>
+    <div class="d-flex mb-3">
+        <div class="container" style="background-color: #3ead5c">
+            <h3 class="title">Login</h3>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="alert alert-danger">
+                {{ messages[0] }}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <form action="/login" method="POST">
+                <div class="field">
+                    <div class="mb-3">
+                        <input autofocus="" class="form-control" name="email" placeholder="Email"
+                               type="email">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="mb-3">
+                        <input class="form-control" name="password" placeholder="Password" type="password">
+                    </div>
+                </div>
+                <button class="btn btn-primary">Login</button>
+            </form>
+            <table>&nbsp</table>
+        </div>
+    </div>
+    <div></div>
+</div>
+
+{% endblock %}
