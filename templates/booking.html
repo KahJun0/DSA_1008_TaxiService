@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link crossorigin="" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      rel="stylesheet"/>
+<script crossorigin=""
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+{% endblock %}
+{% block content %}
+<div>
+    <table>&nbsp</table>
+    <div class="container">
+        <div id='mapdiv' style='height:800px;'></div>
+    </div>
+    <div class="d-flex justify-content-between">
+        <div></div>
+        <div class="d-flex mb-3">
+            <div class="container mb-3" style="background-color: #7bfc3f">
+                <table>&nbsp</table>
+                <div class="mb-3">
+                    <form action="{{ url_for('main.new_booking') }}" method="post">
+                        <div class="form-group">
+                            <label for="fromLoc">From:</label>
+                            <select class="form-control" id="fromLoc" name="fromLoc">
+                                {% for loc in map_var %}
+                                <option>{{loc[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="toLoc">To:</label>
+                            <select class="form-control" id="toLoc" name="toLoc">
+                                {% for loc in map_var %}
+                                <option>{{loc[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+</div>
+<script>
+          var center = L.bounds([1.56073, 104.11475], [1.16, 103.502]).getCenter();
+          var map = L.map('mapdiv').setView([center.x, center.y], 12);
+
+          var basemap = L.tileLayer('https://maps-{s}.onemap.sg/v3/Default/{z}/{x}/{y}.png', {
+            detectRetina: true,
+            maxZoom: 18,
+            minZoom: 11,
+            //Do not remove this attribution
+            attribution: '<img src="https://docs.onemap.gov.sg/maps/images/oneMap64-01.png" style="height:20px;width:20px;"/> OneMap | Map data &copy; contributors, <a href="http://SLA.gov.sg">Singapore Land Authority</a>'
+          });
+
+
+          map.setMaxBounds([[1.56073, 104.1147], [1.16, 103.502]]);
+
+          basemap.addTo(map);
+
+
+
+          {% if map_var %}
+          var arr_len = {{map_var | safe}}.length;
+          {{map_var | safe}}.forEach(show_marker)
+
+          function show_marker(item,index){
+              L.marker([item[1],item[2]],{title:item[0]}).addTo(map);
+          }
+          {% endif %}
+
+          {% if test %}
+          console.log({{test | safe}})
+          {% endif %}
+
+
+
+
+
+</script>
+
+{% endblock %}
