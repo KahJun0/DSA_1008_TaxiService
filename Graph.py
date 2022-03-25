@@ -1,44 +1,7 @@
 from queue import PriorityQueue
-from tracemalloc import start
 
 
 class Graph:
-    def __init__(self, num_of_vertices):
-        # set the number of vertices it has i.e. how many connections
-        self.v = num_of_vertices
-        self.edges = [[-1 for i in range(num_of_vertices)] for j in range(num_of_vertices)]
-        self.visited = []
-
-    # sets the connected node's weight/distance
-    def add_edge(self, u, v, weight):
-        self.edges[u][v] = weight
-        self.edges[v][u] = weight
-
-    def dijkstra(self, graph, start_vertex):
-        self.starting_point = start_vertex
-        D = {v: float('inf') for v in range(graph.v)}
-        D[start_vertex] = 0
-
-        pq = PriorityQueue()
-        pq.put((0, start_vertex))
-
-        while not pq.empty():
-            (dist, current_vertex) = pq.get()
-            graph.visited.append(current_vertex)
-
-            for neighbor in range(graph.v):
-                if graph.edges[current_vertex][neighbor] != -1:
-                    distance = graph.edges[current_vertex][neighbor]
-                    if neighbor not in graph.visited:
-                        old_cost = D[neighbor]
-                        new_cost = D[current_vertex] + distance
-                        if new_cost < old_cost:
-                            pq.put((new_cost, neighbor))
-                            D[neighbor] = new_cost
-        return D
-
-
-def init():
     overview = {0: ['Yio Chu Kang Sports and Recreation Centre Drop Off Point', 1.38367, 103.84627],
                 1: ['Avenue 9 to Yio Chu Kang Sports and Recreation Centre Junction', 1.3842, 103.8453],
                 2: ['Avenue 9 to Avenue 6 Junction', 1.38394, 103.84329],
@@ -80,7 +43,6 @@ def init():
                 38: ['Avenue 5 to Avenue 10 Junction', 1.37571, 103.85474],
                 39: ['Avenue 10 to Cheng San Market Junction', 1.37365, 103.85541],
                 40: ['Cheng San Market Drop Off Point', 1.37312, 103.85479]}
-
     allEdges = {0: [0, 1, 178],
                 1: [1, 2, 226],
                 2: [2, 3, 219],
@@ -122,15 +84,96 @@ def init():
                 38: [38, 39, 248],
                 39: [39, 40, 94]}
 
-    g = Graph(41)
-    for each_edge in range(len(allEdges.keys())):
-        value_list = allEdges[each_edge]
-        g.add_edge(value_list[0], value_list[1], value_list[2])
+    def __init__(self, num_of_vertices):
+        # set the number of vertices it has i.e. how many connections
+        self.v = num_of_vertices
+        self.edges = [[-1 for i in range(num_of_vertices)] for j in range(num_of_vertices)]
+        self.visited = []
+        # initialises the graph
+        for each_edge in range(len(self.allEdges.keys())):
+            value_list = self.allEdges[each_edge]
+            self.add_edge(value_list[0], value_list[1], value_list[2])
 
-    # D = g.dijkstra(g, 0)
-    # location_list = overview[g.starting_point]
-    # for vertex in range(len(D)):
-    #     destination_list = overview[vertex]
-    #     print("Distance from", location_list[0], "to", destination_list[0], "is", D[vertex])
+    # sets the connected node's weight/distance
+    def add_edge(self, u, v, weight):
+        self.edges[u][v] = weight
+        self.edges[v][u] = weight
 
-    return g, overview
+    def dijkstra(self, graph, start_vertex, end_vertex):
+        self.starting_point = start_vertex
+        self.end_point = end_vertex
+        self.shortest_Path = []
+        D = {v: float('inf') for v in range(graph.v)}
+        D[start_vertex] = 0
+        self.parent = {v: int(-1) for v in range(graph.v)}
+
+        pq = PriorityQueue()
+        pq.put((0, start_vertex))
+
+        while not pq.empty():
+            (dist, current_vertex) = pq.get()
+            graph.visited.append(current_vertex)
+
+            for neighbor in range(graph.v):
+                if graph.edges[current_vertex][neighbor] != -1:
+                    distance = graph.edges[current_vertex][neighbor]
+                    if neighbor not in graph.visited:
+                        old_cost = D[neighbor]
+                        new_cost = D[current_vertex] + distance
+                        if new_cost < old_cost:
+                            pq.put((new_cost, neighbor))
+                            D[neighbor] = new_cost
+                            self.parent[neighbor] = current_vertex
+
+        return D
+
+    def getSolutions(self, mode, D):
+        if mode == 1:  # returns shortest path
+            self.pathSolution(self.parent, self.end_point)
+            return self.shortest_Path
+
+        if mode == 2:  # returns full Solution
+            self.printSolution(D, self.parent)
+
+        if mode == 3:  # returns nearby nodes
+            self.getRadiusNodes(D)
+            return self.radiusNodes
+
+        if mode == 4:  # shows shortest distance from starting point to every other nodes.
+            self.getAllPath(D, self.parent)
+
+    def printPath(self, parent, j):  # functions that prints out shortest route taken recursively
+        # Base Case : If j is source
+        if parent[j] == -1:
+            print(j, end=" ")
+            return
+        self.printPath(parent, parent[j])
+        print(j, end=" ")
+
+    def pathSolution(self, parent, j):
+        # Base Case : If j is source
+        if parent[j] == -1:
+            self.shortest_Path.append(j)
+            return
+        self.pathSolution(parent, parent[j])
+        self.shortest_Path.append(j)
+
+    def printSolution(self, dist, parent):
+        src = self.starting_point
+        print("Vertex \t\tDistance from Source\tPath")
+        print("\n%d --> %d \t\t%d \t\t" % (src, self.end_point, dist[self.end_point]), end=" ")
+        self.printPath(parent, self.end_point)
+
+    def getAllPath(self, dist, parent):
+        src = self.starting_point
+        print("Vertex \t\tDistance from Source\tPath")
+        for i in range(0, len(dist)):
+            print("\n%d --> %d \t\t%d \t\t" % (src, i, dist[i]), end=" ")
+            self.printPath(parent, i)
+
+    def getRadiusNodes(self, dist):  # this function returns all nearby nodes based on radius set.
+        src = self.starting_point
+        self.radiusNodes = []
+        for i in range(0, len(dist)):  # iterates through the whole distance list generated by dijkstra
+            if dist[i] < 1000:  # radius set = 1000
+                self.radiusNodes.append(i)

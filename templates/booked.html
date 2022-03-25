@@ -14,14 +14,42 @@
     <div class="container">
         <div id='mapdiv' style='height:800px;'></div>
     </div>
-    {% if test %}
+    {% if match %}
     <div class="d-flex justify-content-between">
         <div></div>
         <div class="d-flex mb-3">
             <div class="container mb-3" style="background-color: #7bfc3f">
                 <table>&nbsp</table>
                 <div>
-                    You are travelling from {{test[0][0]}} to {{test[1][0]}} with distance
+                    Your driver is {{match}}.
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+    {% endif %}
+    {% if start %}
+    <div class="d-flex justify-content-between">
+        <div></div>
+        <div class="d-flex mb-3">
+            <div class="container mb-3" style="background-color: #7bfc3f">
+                <table>&nbsp</table>
+                <div>
+                    You are starting from {{start[0][0]}}, {{start[0][1]}} to {{start[1][0]}}, {{start[1][1]}}
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+    {% endif %}
+    {% if status_driver %}
+    <div class="d-flex justify-content-between">
+        <div></div>
+        <div class="d-flex mb-3">
+            <div class="container mb-3" style="background-color: #7bfc3f">
+                <table>&nbsp</table>
+                <div>
+                    You are starting from {{status_driver[0]}} to {{status_driver[1]}}
                 </div>
             </div>
         </div>
@@ -48,13 +76,16 @@
 
 
 
-          {% if test %}
-          var arr_len = {{test | safe}}.length;
-          {{test | safe}}.forEach(show_marker)
+          {% if return_val %}
+          var latlngs = Array();
+          var arr_len = {{return_val | safe}}.length;
+          {{return_val | safe}}.forEach(show_marker)
 
           function show_marker(item,index){
               L.marker([item[1],item[2]],{title:item[0]}).addTo(map);
+              latlngs.push(L.marker([item[1],item[2]]).getLatLng())
           }
+          var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
           {% endif %}
 
 
