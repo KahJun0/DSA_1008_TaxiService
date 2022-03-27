@@ -30,18 +30,22 @@ class Record:
         self.passengerStartRadius = startRadius
         self.passengerEndRadius = endRadius
 
-    def invertIndex(
-            self):  # this function inverts the index of the driver nodes (to show which nodes will be touched if
-        # there are multiple drivers)
-
-        for key, values in self.driverRecords.items():
-            for value in values:
-                if value not in self.invert:
-                    self.invert[value] = []
-                self.invert[value].append(key)
-        self.splitInvert = [[k, v] for k, values in self.invert.items() for v in
-                            values]  # this lines converts the invert dictionary into a list, splitting each
-        # idividual nodes with its rider.
+    def invertIndex(self):  # this function inverts the index
+        # of the driver nodes (to show which nodes will be touched if there are multiple drivers)
+        try:
+            if self.driverRecords:
+                for key, values in self.driverRecords.items():
+                    for value in values:
+                        if value not in self.invert:
+                            self.invert[value] = []
+                        self.invert[value].append(key)
+                self.splitInvert = [[k, v] for k, values in self.invert.items() for v in
+                                    values]  # this lines converts the invert dictionary into a list, splitting each
+                # idividual nodes with its rider.
+            else:
+                raise ValueError('Sorry, there are no drivers offering a ride at the moment')
+        except ValueError as e:
+            print(e.args)
 
     def intersect(self, dict, list):  # AND operation between two sets (for compare function)
         intersectList = []
@@ -63,7 +67,6 @@ class Record:
                 raise ValueError('Sorry, there is no driver nearby')
         except ValueError as err:
             print(err.args)
-            quit()
 
     def selectingRides(self, distStart, distEnd):
         self.startTable = {}

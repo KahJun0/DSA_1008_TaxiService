@@ -48,12 +48,16 @@ def new_booking():
             to_node = i
             i += 1
     add_passenger = Passenger(current_user.id, current_user.name)
-    match = add_passenger.requestRide(db, from_node, to_node)
-    node_list = add_passenger.visitingNodes
-    return_val = []
-    for i in node_list:
-        return_val.append(overview[i])
-    return render_template('booked.html', name=current_user.name, match=match, return_val=return_val)
+    try:
+        match = add_passenger.requestRide(db, from_node, to_node)
+        node_list = add_passenger.visitingNodes
+        return_val = []
+        for i in node_list:
+            return_val.append(overview[i])
+        return render_template('booked.html', name=current_user.name, match=match, return_val=return_val)
+    except ValueError:
+        return render_template('booked.html', name=current_user.name, no_rides='No rides found')
+
 
 
 @main.route('/new_driver', methods=['POST'])

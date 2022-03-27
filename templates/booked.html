@@ -14,6 +14,20 @@
     <div class="container">
         <div id='mapdiv' style='height:800px;'></div>
     </div>
+    {% if no_rides %}
+    <div class="d-flex justify-content-between">
+        <div></div>
+        <div class="d-flex mb-3">
+            <div class="container mb-3" style="background-color: #7bfc3f">
+                <table>&nbsp</table>
+                <div>
+                    {{no_rides}}.
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+    {% endif %}
     {% if match %}
     <div class="d-flex justify-content-between">
         <div></div>
