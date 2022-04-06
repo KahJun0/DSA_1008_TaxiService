@@ -70,6 +70,23 @@
         <div></div>
     </div>
     {% endif %}
+    {% if passenger %}
+    <div class="d-flex justify-content-between">
+        <div></div>
+        <div class="d-flex mb-3">
+            <div class="container mb-3" style="background-color: #7bfc3f">
+                <table>&nbsp</table>
+                <div>
+                    Your passenger is {{passenger[0]}}.
+                </div>
+                <form action="/clear_ride">
+                    <button class="btn btn-success" type="submit">Finish Ride</button>
+                </form>
+            </div>
+        </div>
+        <div></div>
+    </div>
+    {% endif %}
 </div>
 <script>
           var center = L.bounds([1.56073, 104.11475], [1.16, 103.502]).getCenter();
@@ -101,6 +118,19 @@
           }
           var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
           {% endif %}
+
+          {% if passenger %}
+          var latlngs = Array();
+          var arr_len = {{passenger[1] | safe}}.length;
+          {{passenger[1] | safe}}.forEach(show_marker)
+
+          function show_marker(item,index){
+              L.marker([item[1],item[2]],{title:item[0]}).addTo(map);
+              latlngs.push(L.marker([item[1],item[2]]).getLatLng())
+          }
+          var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+          {% endif %}
+
 
 
 

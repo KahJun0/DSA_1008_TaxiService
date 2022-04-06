@@ -5,10 +5,13 @@ from .MatchingSystem import Record, Driver, Passenger
 
 main = Blueprint('main', __name__)
 db = Record()
+ride_dict = {}
 
 
 @main.route('/')
 def index():
+    if current_user.is_authenticated and ride_dict.get(current_user.name) is not None:
+        return render_template('index.html', booked=True)
     return render_template('index.html')
 
 
@@ -20,12 +23,16 @@ def redirect_back():
 @main.route('/user')
 @login_required
 def user():
+    if ride_dict.get(current_user.name) is not None:
+        return render_template('profile.html', name=current_user.name, booked=True)
     return render_template('profile.html', name=current_user.name)
 
 
 @main.route('/map')
 @login_required
 def map():
+    if ride_dict.get(current_user.name) is not None:
+        return render_template('user.html', name=current_user.name, booked=True)
     return render_template('user.html', name=current_user.name)
 
 
@@ -54,10 +61,10 @@ def new_booking():
         return_val = []
         for i in node_list:
             return_val.append(overview[i])
+        ride_dict[match] = [current_user.name, return_val]
         return render_template('booked.html', name=current_user.name, match=match, return_val=return_val)
     except ValueError:
         return render_template('booked.html', name=current_user.name, no_rides='No rides found')
-
 
 
 @main.route('/new_driver', methods=['POST'])
@@ -87,10 +94,14 @@ def new_driver():
 @login_required
 def booked():
     if current_user.membership == 0:
-        list_drivers = db.drivers
-        for i in db.drivers:
-            if i.name == current_user.name:
-                return render_template('booked.html', name=current_user.name, status_driver=[i.starting, i.destination])
+        passenger = ride_dict.get(current_user.name)
+        if passenger is None:
+            for i in db.drivers:
+                if i.name == current_user.name:
+                    return render_template('booked.html', name=current_user.name, status_driver=[i.starting,
+                                                                                                 i.destination])
+        elif passenger:
+            return render_template('booked.html', name=current_user.name, passenger=passenger)
 
 
 @main.route('/booking')
@@ -108,6 +119,16 @@ def booking():
                                membership=current_user.membership)
 
 
+@main.route('/clear_ride')
+@login_required
+def clear_ride():
+    try:
+        del ride_dict[current_user.name]
+    except KeyError:
+        pass
+    return redirect(url_for('main.booking'))
+
+
 @main.route('/display_map')
 @login_required
 def display_map():
@@ -115,9 +136,13 @@ def display_map():
     return_val = []
     for k, v in overview.items():
         return_val.append(v)
+    if ride_dict.get(current_user.name) is not None:
+        return render_template('map.html', map_vars=return_val, booked=True)
     return render_template('map.html', map_vars=return_val)
 
 
 @main.route('/driver')
 def driver():
+    if current_user.is_authenticated and ride_dict.get(current_user.name) is not None:
+        return render_template('driver.html', booked=True)
     return render_template('driver.html')

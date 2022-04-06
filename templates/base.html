@@ -31,11 +31,20 @@
                             <button class="btn btn-success" type="submit">User Page</button>
                         </form>
                     </div>
+                    {% if not booked %}
                     <div>
                         <form action="/booking">
                             <button class="btn btn-info" type="submit">Booking</button>
                         </form>
                     </div>
+                    {% endif %}
+                    {% if booked %}
+                    <div>
+                        <form action="/booked">
+                            <button class="btn btn-info" type="submit">Current Booking</button>
+                        </form>
+                    </div>
+                    {% endif %}
                     <div>
                         <form action="/map">
                             <button class="btn btn-warning" type="submit">Map</button>
